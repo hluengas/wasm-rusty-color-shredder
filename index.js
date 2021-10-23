@@ -1,8 +1,10 @@
-import('./pkg')
-    .then(wasm_rusty_color_shredder => {
-        const color_shredder_canvas = document.getElementById('color_shredder_canvas');
-        const canvas_context = color_shredder_canvas.getContext('2d');
+const color_shredder = import('./pkg');
+const js_canvas = document.getElementById('color_shredder_canvas');
+const canvas_context = js_canvas.getContext('2d');
 
-        wasm_rusty_color_shredder.main(canvas_context, 512, 512);
-    })
-    .catch(console.error);
+
+color_shredder.then(wasm => {
+    var canvas = wasm.Canvas.new(512, 512);
+    // wasm.populate_test_image(canvas);
+    wasm.render_canvas(canvas,canvas_context);
+}).catch(console.error);

@@ -6,37 +6,53 @@ use web_sys::{CanvasRenderingContext2d, ImageData};
 use rand::Rng;
 
 #[wasm_bindgen]
-pub fn main(
-    canvas_context: &CanvasRenderingContext2d,
-    width: u32,
-    height: u32,
-) -> Result<(), JsValue> {
-    // generate a test image (u8 vec)
-    let mut canvas_data = create_test_image(width, height);
-    // create canvas ImageData from u8 vec
-    let canvas_data =
-        ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut canvas_data), width, height)?;
-    // send to the canvas
-    canvas_context.put_image_data(&canvas_data, 0.0, 0.0)
+pub struct Canvas {
+    data: Vec<u8>,
+    height: usize,
+    width: usize,
 }
 
-fn create_test_image(width: u32, height: u32) -> Vec<u8> {
-    let mut rng = rand::thread_rng();
-    let mut data = Vec::new();
+#[wasm_bindgen]
+impl Canvas {
+    // constructor
+    pub fn new(width: usize, height: usize) -> Canvas {
+        let data: Vec<u8> = vec![0; (4 * width * height) as usize];
 
-    for _ in 0..width {
-        for _ in 0..height {
-            let r_value: u8 = rng.gen();
-            let g_value: u8 = rng.gen();
-            let b_value: u8 = rng.gen();
-            let a_value: u8 = 255;
-
-            data.push(r_value);
-            data.push(g_value);
-            data.push(b_value);
-            data.push(a_value);
+        Canvas {
+            width,
+            height,
+            data,
         }
     }
+}
 
-    data
+#[wasm_bindgen]
+pub fn render_canvas(
+    canvas: &mut Canvas,
+    context: &CanvasRenderingContext2d,
+) -> Result<(), JsValue> {
+
+    // test image
+    populate_random_test_image(canvas);
+
+    // create canvas ImageData from u8 vec
+    let canvas_image_data = ImageData::new_with_u8_clamped_array_and_sh(
+        Clamped(&canvas.data),
+        canvas.width as u32,
+        canvas.height as u32,
+    )?;
+    // send to the canvas
+    context.put_image_data(&canvas_image_data, 0.0, 0.0)
+}
+
+fn populate_random_test_image(canvas: &mut Canvas) {
+    let mut rng = rand::thread_rng();
+
+    for x in 0..canvas.width {
+        for y in 0..canvas.height {
+            for i in 0..4 {
+                canvas.data[(x * 4) + (y * canvas.width * 4) + i] = rng.gen();
+            }
+        }
+    }
 }

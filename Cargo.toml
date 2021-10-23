@@ -1,5 +1,5 @@
 [package]
-name = "canvas"
+name = "color_shredder"
 version = "0.1.0"
 authors = ["Henry Luengas"]
 edition = "2018"
@@ -23,5 +23,9 @@ features = [
 version = "0.3.4"
 features = [
     "ImageData",
-    "CanvasRenderingContext2d"
+    "CanvasRenderingContext2d",
+    'Document',
+    'Element',
+    'HtmlCanvasElement',
+    'Window',
 ]
