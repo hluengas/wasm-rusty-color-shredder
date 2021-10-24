@@ -1,58 +1,34 @@
 use wasm_bindgen::prelude::*;
+// use web_sys::*;
+use web_sys::WebGlRenderingContext as GL;
 
-use wasm_bindgen::Clamped;
-use web_sys::{CanvasRenderingContext2d, ImageData};
-
-use rand::Rng;
+mod gl_setup;
+mod shaders;
+mod programs;
+mod common_functions;
 
 #[wasm_bindgen]
 pub struct Canvas {
-    data: Vec<u8>,
-    height: usize,
-    width: usize,
+    webgl_context: GL,
 }
 
 #[wasm_bindgen]
 impl Canvas {
-    // constructor
-    pub fn new(width: usize, height: usize) -> Canvas {
-        let data: Vec<u8> = vec![0; (4 * width * height) as usize];
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        console_error_panic_hook::set_once();
+        let webgl_context = gl_setup::initialize_webgl_contex().unwrap();
 
-        Canvas {
-            width,
-            height,
-            data,
+        Self {
+            webgl_context,
         }
     }
-}
 
-#[wasm_bindgen]
-pub fn render_canvas(
-    canvas: &mut Canvas,
-    context: &CanvasRenderingContext2d,
-) -> Result<(), JsValue> {
+    pub fn update(&mut self, _time: f32, _height: f32, _width: f32) -> Result<(), JsValue> {
+        Ok(())
+    }
 
-    // test image
-    populate_random_test_image(canvas);
-
-    // create canvas ImageData from u8 vec
-    let canvas_image_data = ImageData::new_with_u8_clamped_array_and_sh(
-        Clamped(&canvas.data),
-        canvas.width as u32,
-        canvas.height as u32,
-    )?;
-    // send to the canvas
-    context.put_image_data(&canvas_image_data, 0.0, 0.0)
-}
-
-fn populate_random_test_image(canvas: &mut Canvas) {
-    let mut rng = rand::thread_rng();
-
-    for x in 0..canvas.width {
-        for y in 0..canvas.height {
-            for i in 0..4 {
-                canvas.data[(x * 4) + (y * canvas.width * 4) + i] = rng.gen();
-            }
-        }
+    pub fn render(&self) {
+        self.webgl_context.clear(GL::COLOR_BUFFER_BIT | GL :: DEPTH_BUFFER_BIT);
     }
 }
