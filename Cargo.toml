@@ -26,6 +26,8 @@ features = [
     "ImageData",
     "WebGlShader",
     "WebGlProgram",
+    "WebGlBuffer",
+    "WebGlUniformLocation",
     "WebGlRenderingContext",
     'Document',
     'Element',

@@ -1,15 +1,16 @@
 use wasm_bindgen::prelude::*;
 // use web_sys::*;
-use web_sys::WebGlRenderingContext as GL;
+use web_sys::WebGlRenderingContext;
 
-mod gl_setup;
-mod shaders;
-mod programs;
 mod common_functions;
+mod gl_setup;
+mod programs;
+mod shaders;
 
 #[wasm_bindgen]
 pub struct Canvas {
-    webgl_context: GL,
+    webgl_context: WebGlRenderingContext,
+    webgl_program: programs::Color2D,
 }
 
 #[wasm_bindgen]
@@ -20,7 +21,8 @@ impl Canvas {
         let webgl_context = gl_setup::initialize_webgl_contex().unwrap();
 
         Self {
-            webgl_context,
+            webgl_program: programs::Color2D::new(&webgl_context),
+            webgl_context: webgl_context,
         }
     }
 
@@ -29,6 +31,18 @@ impl Canvas {
     }
 
     pub fn render(&self) {
-        self.webgl_context.clear(GL::COLOR_BUFFER_BIT | GL :: DEPTH_BUFFER_BIT);
+        self.webgl_context.clear(
+            WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
+        );
+
+        self.webgl_program.render(
+            &self.webgl_context,
+            0.0,  //bottom
+            10.0, //top
+            0.0,  //left
+            10.0, //right
+            10.0, //height
+            10.0, //width
+        );
     }
 }
