@@ -1,11 +1,11 @@
 use wasm_bindgen::prelude::*;
-// use web_sys::*;
 use web_sys::WebGlRenderingContext;
 
 mod common_functions;
 mod gl_setup;
 mod programs;
 mod shaders;
+mod app_state;
 
 #[wasm_bindgen]
 pub struct Canvas {
@@ -26,8 +26,9 @@ impl Canvas {
         }
     }
 
-    pub fn update(&mut self, _time: f32, _height: f32, _width: f32) -> Result<(), JsValue> {
-        Ok(())
+    pub fn update(&mut self, time: f32, height: f32, width: f32) -> Result<(), JsValue> {
+        app_state::update_dynamic_data(time, height, width);
+        return Ok(());
     }
 
     pub fn render(&self) {
@@ -35,14 +36,16 @@ impl Canvas {
             WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
         );
 
+        let current_state = app_state::get_current_state();
+
         self.webgl_program.render(
             &self.webgl_context,
-            0.0,  //bottom
-            10.0, //top
-            0.0,  //left
-            10.0, //right
-            10.0, //height
-            10.0, //width
+            current_state.control_bottom,
+            current_state.control_top,
+            current_state.control_left,
+            current_state.control_right,
+            current_state.canvas_height,
+            current_state.canvas_width,
         );
     }
 }

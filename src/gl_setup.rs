@@ -10,7 +10,7 @@ pub fn initialize_webgl_contex() -> Result<WebGlRenderingContext, JsValue> {
     let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
     let webgl_context: WebGlRenderingContext = canvas.get_context("webgl")?.unwrap().dyn_into()?;
 
-    webgl_context.clear_color(0.0, 0.5, 0.0, 1.0);
+    webgl_context.clear_color(0.0, 0.0, 0.0, 1.0);
     webgl_context.clear_depth(1.0);
 
     return Ok(webgl_context);
