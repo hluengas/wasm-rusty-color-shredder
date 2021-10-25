@@ -90,7 +90,7 @@ impl Color2D {
 
         webgl_context.uniform4f(
             Some(&self.u_color),
-            0., //r
+            0.0, //r
             0.5,//g
             0.5,//b
             1.0,//a
@@ -99,15 +99,15 @@ impl Color2D {
         webgl_context.uniform1f(Some(&self.u_opacity), 1.);
 
         let translation_mat = common_functions::translation_matrix(
-            2. * left / canvas_width - 1.,
-            2. * bottom / canvas_height - 1.,
-            0.,
+            2.0 * left / canvas_width - 1.0,
+            2.0 * bottom / canvas_height - 1.0,
+            0.0,
         );
 
         let scale_mat = common_functions::scaling_matrix(
-            2. * (right - left) / canvas_width,
-            2. * (top - bottom) / canvas_height,
-            0.,
+            2.0 * (right - left) / canvas_width,
+            2.0 * (top - bottom) / canvas_height,
+            0.0,
         );
 
         let transform_mat = common_functions::mult_matrix_4(scale_mat, translation_mat);
