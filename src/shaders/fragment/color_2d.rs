@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub const SHADER: &str = r#"
     precision mediump float;
 

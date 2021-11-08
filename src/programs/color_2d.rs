@@ -6,6 +6,7 @@ use web_sys::WebGlProgram;
 use web_sys::WebGlRenderingContext;
 use web_sys::WebGlUniformLocation;
 
+#[allow(dead_code)]
 pub struct Color2D {
     program: WebGlProgram,
     vertex_array_len: usize,
@@ -15,6 +16,7 @@ pub struct Color2D {
     u_transform: WebGlUniformLocation,
 }
 
+#[allow(dead_code)]
 impl Color2D {
     pub fn new(webgl_context: &WebGlRenderingContext) -> Self {
         let program = common_functions::link_program(

@@ -10,7 +10,6 @@ mod shaders;
 #[wasm_bindgen]
 pub struct Canvas {
     webgl_context: WebGlRenderingContext,
-    webgl_program_color_2d: programs::Color2D,
     webgl_program_color_2d_gradient: programs::Color2DGradient,
 }
 
@@ -22,7 +21,6 @@ impl Canvas {
         let webgl_context = gl_setup::initialize_webgl_contex().unwrap();
 
         Self {
-            webgl_program_color_2d: programs::Color2D::new(&webgl_context),
             webgl_program_color_2d_gradient: programs::Color2DGradient::new(&webgl_context),
             webgl_context: webgl_context,
         }
@@ -39,16 +37,6 @@ impl Canvas {
         );
 
         let current_state = app_state::get_current_state();
-
-        // self.webgl_program_color_2d.render(
-        //     &self.webgl_context,
-        //     current_state.control_bottom,
-        //     current_state.control_top,
-        //     current_state.control_left,
-        //     current_state.control_right,
-        //     current_state.canvas_height,
-        //     current_state.canvas_width,
-        // );
 
         self.webgl_program_color_2d_gradient.render(
             &self.webgl_context,
