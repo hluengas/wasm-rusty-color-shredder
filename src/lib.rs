@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::WebGlRenderingContext;
 
 mod app_state;
+mod constants;
 mod common_functions;
 mod gl_setup;
 mod programs;
