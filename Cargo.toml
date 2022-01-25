@@ -28,6 +28,7 @@ features = [
     "WebGlShader",
     "WebGlProgram",
     "WebGlBuffer",
+    "WebGlTexture",
     "WebGlUniformLocation",
     "WebGlRenderingContext",
     'Document',

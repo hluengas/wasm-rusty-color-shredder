@@ -4,10 +4,13 @@ use wasm_bindgen::JsCast;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlProgram;
 use web_sys::WebGlRenderingContext;
+use web_sys::WebGlTexture;
 use web_sys::WebGlUniformLocation;
 
 pub struct Texture2D {
     program: WebGlProgram,
+    rectangle_texture: WebGlTexture,
+    rectangle_texcoord_buffer: WebGlBuffer,
     rectangle_color_buffer: WebGlBuffer,
     rectangle_vertex_buffer: WebGlBuffer,
     rectangle_index_count: i32,
@@ -32,6 +35,7 @@ impl Texture2D {
         // create rectangle color buffer (not filled)
         let rectangle_color_buffer: web_sys::WebGlBuffer = new_color_buffer(&webgl_context);
         //create & fill texture coordinate buffer
+        let rectangle_texcoord_buffer: web_sys::WebGlBuffer = new_texcoord_buffer(&webgl_context);
 
         // get uniform pointers
         let u_opacity = webgl_context
@@ -41,15 +45,21 @@ impl Texture2D {
             .get_uniform_location(&program, "uTransform")
             .unwrap();
 
+        let rectangle_texture: WebGlTexture = webgl_context.create_texture().unwrap();
+
         // instantiate
         Self {
             // uniforms
             u_opacity: u_opacity,
             u_transform: u_transform,
 
+            // textures
+            rectangle_texture: rectangle_texture,
+
             // buffers
             rectangle_vertex_buffer: rectangle_vertex_buffer,
             rectangle_color_buffer: rectangle_color_buffer,
+            rectangle_texcoord_buffer: rectangle_texcoord_buffer,
 
             // counts
             rectangle_index_count: rectangle_index_count,
@@ -87,20 +97,53 @@ impl Texture2D {
         );
         webgl_context.enable_vertex_attrib_array(0);
 
-        // set attributes for and enable rectangle color buffer
+        // set attributes for and enable rectangle texcoord buffer
         webgl_context.bind_buffer(
             WebGlRenderingContext::ARRAY_BUFFER,
-            Some(&self.rectangle_color_buffer),
+            Some(&self.rectangle_texcoord_buffer),
         );
         webgl_context.vertex_attrib_pointer_with_i32(
             1,
-            4,
+            2,
             WebGlRenderingContext::FLOAT,
             false,
             0,
             0,
         );
         webgl_context.enable_vertex_attrib_array(1);
+
+        // set attributes for and enable rectangle color buffer
+        webgl_context.bind_buffer(
+            WebGlRenderingContext::ARRAY_BUFFER,
+            Some(&self.rectangle_color_buffer),
+        );
+        webgl_context.vertex_attrib_pointer_with_i32(
+            2,
+            4,
+            WebGlRenderingContext::FLOAT,
+            false,
+            0,
+            0,
+        );
+        webgl_context.enable_vertex_attrib_array(2);
+
+        webgl_context.bind_texture(
+            WebGlRenderingContext::TEXTURE_2D,
+            Some(&self.rectangle_texture),
+        );
+        let temp_tex_array: [u8; 4] = [0,0,255,255];
+        webgl_context
+            .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_array_buffer_view(
+                WebGlRenderingContext::TEXTURE_2D,
+                0,
+                WebGlRenderingContext::RGBA as i32,
+                1,
+                1,
+                0,
+                WebGlRenderingContext::RGBA,
+                WebGlRenderingContext::UNSIGNED_BYTE,
+                broken,
+            );
 
         // send opacity uniform
         webgl_context.uniform1f(Some(&self.u_opacity), 0.5);
