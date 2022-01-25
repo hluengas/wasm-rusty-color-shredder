@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub const SHADER: &str = r#"
     attribute vec4 aPosition;
     attribute vec4 aColor;

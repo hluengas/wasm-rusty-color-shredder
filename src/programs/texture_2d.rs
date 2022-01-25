@@ -6,8 +6,7 @@ use web_sys::WebGlProgram;
 use web_sys::WebGlRenderingContext;
 use web_sys::WebGlUniformLocation;
 
-#[allow(dead_code)]
-pub struct Color2DGradient {
+pub struct Texture2D {
     program: WebGlProgram,
     rectangle_color_buffer: WebGlBuffer,
     rectangle_vertex_buffer: WebGlBuffer,
@@ -16,14 +15,13 @@ pub struct Color2DGradient {
     u_transform: WebGlUniformLocation,
 }
 
-#[allow(dead_code)]
-impl Color2DGradient {
+impl Texture2D {
     pub fn new(webgl_context: &WebGlRenderingContext) -> Self {
         // create program
         let program = common_functions::link_program(
             &webgl_context,
-            super::super::shaders::vertex::color_2d_gradient::SHADER,
-            super::super::shaders::fragment::color_2d_gradient::SHADER,
+            super::super::shaders::vertex::texture_2d::SHADER,
+            super::super::shaders::fragment::texture_2d::SHADER,
         )
         .unwrap();
 
@@ -33,6 +31,7 @@ impl Color2DGradient {
         let rectangle_index_count: i32 = new_index_buffer(&webgl_context);
         // create rectangle color buffer (not filled)
         let rectangle_color_buffer: web_sys::WebGlBuffer = new_color_buffer(&webgl_context);
+        //create & fill texture coordinate buffer
 
         // get uniform pointers
         let u_opacity = webgl_context
@@ -171,6 +170,48 @@ fn new_vertex_buffer(webgl_context: &WebGlRenderingContext) -> web_sys::WebGlBuf
     );
 
     return rectangle_vertex_buffer;
+}
+
+fn new_texcoord_buffer(webgl_context: &WebGlRenderingContext) -> web_sys::WebGlBuffer {
+    // define rectangle triangle vertex indicies
+    let rectangle_texcoord_array: [f32; 12] = [
+        0.0, 1.0, // x, y
+        0.0, 0.0, // x, y
+        1.0, 1.0, // x, y
+        0.0, 0.0, // x, y
+        0.0, 1.0, // x, y
+        1.0, 1.0, // x, y
+    ];
+    // allocate memory buffer
+    let texcoord_memory_buffer = wasm_bindgen::memory()
+        .dyn_into::<WebAssembly::Memory>()
+        .unwrap()
+        .buffer();
+    // get pointer to vertex array
+    let rectangle_texcoord_array_ptr = rectangle_texcoord_array.as_ptr() as u32 / 4;
+    // put vertex array into web_gl format
+    let webgl_texcoord_array = js_sys::Float32Array::new(&texcoord_memory_buffer).subarray(
+        rectangle_texcoord_array_ptr,
+        rectangle_texcoord_array_ptr + rectangle_texcoord_array.len() as u32,
+    );
+    // create webgl buffer
+    let rectangle_texcoord_buffer = webgl_context
+        .create_buffer()
+        .ok_or("failed to create buffer")
+        .unwrap();
+    // bind buffer
+    webgl_context.bind_buffer(
+        WebGlRenderingContext::ARRAY_BUFFER,
+        Some(&rectangle_texcoord_buffer),
+    );
+    // fill buffer
+    webgl_context.buffer_data_with_array_buffer_view(
+        WebGlRenderingContext::ARRAY_BUFFER,
+        &webgl_texcoord_array,
+        WebGlRenderingContext::STATIC_DRAW,
+    );
+
+    return rectangle_texcoord_buffer;
 }
 
 fn new_index_buffer(webgl_context: &WebGlRenderingContext) -> i32 {

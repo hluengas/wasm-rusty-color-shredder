@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 pub const SHADER: &str = r#"
     attribute vec4 aPosition;
-    attribute vec2 a_texcoord;
+    attribute vec2 aTexCoord;
 
     uniform mat4 uTransform;
     
@@ -10,6 +10,6 @@ pub const SHADER: &str = r#"
         gl_Position = uTransform * aPosition;
         
         // Pass the texcoord to the fragment shader.
-        v_texcoord = a_texcoord;
+        v_texcoord = aTexCoord;
     }
 "#;
